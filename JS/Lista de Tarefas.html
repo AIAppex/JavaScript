@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">;
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Tarefas</title>
-    <style> .concluida { text-decoration: line-through; color: grey; } .nao-concluida { color: black; } </style>
+    <style> .concluida { text-decoration: line-through; color: grey; } .nao-concluida { color: black; }</style>
 </head>
 <body>
     <h1>Lista de Tarefas</h1>
@@ -13,7 +13,11 @@
     <ul id="listaTarefas"></ul>
 
     <script>
-        const tarefas = [];
+        let tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
+
+        function salvarTarefas() {
+            localStorage.setItem('tarefas', JSON.stringify(tarefas));
+        }
 
         function renderizarTarefas() {
             const listaTarefas = document.getElementById('listaTarefas');
@@ -24,6 +28,7 @@
                 li.innerHTML = `
                     <input type="checkbox" ${tarefa.status ? 'checked' : ''} onchange="alternarStatus(${index})">
                     ${tarefa.descricao}
+                    <button onclick="excluirTarefa(${index})">Excluir</button>
                 `;
                 listaTarefas.appendChild(li);
             });
@@ -34,16 +39,25 @@
             if (descricaoInput) {
                 tarefas.push({ descricao: descricaoInput, status: false });
                 document.getElementById('descricaoInput').value = '';
+                salvarTarefas();
                 renderizarTarefas();
             }
         }
 
         function alternarStatus(index) {
             tarefas[index].status = !tarefas[index].status;
+            salvarTarefas();
+            renderizarTarefas();
+        }
+
+        function excluirTarefa(index) {
+            tarefas.splice(index, 1);
+            salvarTarefas();
             renderizarTarefas();
         }
 
         document.getElementById('adicionarButton').addEventListener('click', adicionarTarefa);
+        window.onload = renderizarTarefas;
     </script>
 </body>
 </html>
